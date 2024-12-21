@@ -28,7 +28,12 @@ export default {
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
       const day = String(now.getDate()).padStart(2, '0');
-      this.currentDate = `${year}-${month}-${day}`;
+      const formattedDate = `${year}-${month}-${day}`;
+
+      // 更新 localStorage 中的日期
+      localStorage.setItem('currentDate', formattedDate);
+
+      this.currentDate = formattedDate;
     },
     async fetchtotal_workorders_today() {
       try {
@@ -119,8 +124,8 @@ export default {
 
 <template>
   <div style="margin: 10px; width: 100%;">
-      <el-row  :gutter="20" style="display: flex; justify-content:center;">
-        <el-col :span="6" style="width: 100%;">
+      <el-row  :gutter="20" style="display: flex; justify-content:space-around;">
+        <el-col :span="7" style="width: 100%;">
           <div class="statistic-card">
             <el-statistic :value="elderCount">
               <template #title>
@@ -138,7 +143,7 @@ export default {
             </el-statistic>
           </div>
         </el-col>
-        <el-col :span="6" style="width: 100%;">
+        <el-col :span="7" style="width: 100%;">
           <div class="statistic-card">
             <el-statistic :value="alertCount" :value-style="{ color: 'red' }">
               <template #title>
@@ -156,7 +161,7 @@ export default {
             </el-statistic>
           </div>
         </el-col>
-        <el-col :span="6" style="width: 100%;">
+        <el-col :span="7" style="width: 100%;">
           <div class="statistic-card">
             <el-statistic :value="incomplete_workorders_today" :value-style="{ color: 'red' }">
               <template #title>
@@ -182,7 +187,7 @@ export default {
   background-color: var(--el-bg-color-overlay);
   //border: 1px solid #66b1ff;
   /* 添加阴影效果 */
-  box-shadow: 0 7px 10px rgba(42, 44, 189, 0.3);
+  box-shadow: 0 7px 10px rgba(84, 84, 87, 0.3);
   height: 100%;
   min-height: 150px; /* 确保卡片有最低高度 */
   display: flex;
@@ -192,10 +197,6 @@ export default {
 }
 :global(h2#card-usage ~ .example .example-showcase) {
   background-color: var(--el-fill-color) !important;
-}
-
-.el-statistic {
-  --el-statistic-content-font-size: 28px;
 }
 
 

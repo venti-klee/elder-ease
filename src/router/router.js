@@ -1,12 +1,13 @@
 // router/router.js
 import { createRouter, createWebHistory } from 'vue-router';
-
+import AlertDetail from '../views/AlertDetail.vue'; // 确保路径正确
 const routes = [
     {
         path: '/login',
         name: "login",
         component: () => import("../views/LoginView.vue"),
     },
+
     {
         path: '/',
         name: 'index', // 定义名为 'index' 的路由
@@ -17,6 +18,13 @@ const routes = [
                 path: 'home',
                 name: 'home',
                 component: () => import("../views/HomeView.vue"),
+            },
+            {
+                path: '/alerts/:id',
+                name: 'AlertDetail',
+                component: AlertDetail,
+                props: true // 将路由参数作为props传递给组件
+
             },
             {
                 path: 'order-management',

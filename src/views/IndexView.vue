@@ -9,13 +9,13 @@
             background-color="#003873"
             text-color="#fff"
             :router="true"
-            default-active="dashboard"
+            :default-active="activeTabName"
         >
           <template v-for="item in asideMenu" :key="item.title">
             <!-- 两级菜单 -->
             <el-sub-menu
                 v-if="item.subs"
-                :index="item.title"
+                :index="item.index"
             >
               <template #title>
                 <span>{{ item.title }}</span>
@@ -47,35 +47,35 @@
           <span>管理员面板</span>
         </el-header>
         <!-- main主体模块：标签页 + 当前路由内容 -->
-        <el-main class="el-main">
-          <el-tabs
-              v-model="activeTabName"
-              type="card"
-              closable
-              @tab-remove="handleRemove"
-              @tab-click="handleSwitchRoute"
-          >
-            <el-tab-pane
-                v-for="item in editableTabs"
-                :key="item.index"
-                :label="item.title"
-                :name="item.index"
-                :closable="item.closable"
+        <el-scrollbar>
+          <el-main class="el-main">
+            <el-tabs
+                v-model="activeTabName"
+                type="card"
+                closable
+                @tab-remove="handleRemove"
+                @tab-click="handleSwitchRoute"
             >
-              <router-view />
-            </el-tab-pane>
-          </el-tabs>
-        </el-main>
+              <el-tab-pane
+                  v-for="item in editableTabs"
+                  :key="item.index"
+                  :label="item.title"
+                  :name="item.index"
+                  :closable="item.closable"
+              >
+                <router-view @addTab="addTab" />
+              </el-tab-pane>
+            </el-tabs>
+          </el-main>
+        </el-scrollbar>
       </el-container>
     </el-container>
   </div>
 </template>
+
 <script>
 import { ElMessageBox } from 'element-plus';
-import {
-  Document,
-
-} from "@element-plus/icons-vue";
+import { Document } from '@element-plus/icons-vue';
 
 export default {
   components: {
@@ -97,101 +97,80 @@ export default {
       asideMenu: [
         {
           title: "订单/服务",
+          index: "orderService",
           subs: [
-            {
-              title: "订单管理",
-              index: "orderManagement",
-            },
-            {
-              title: "工单管理",
-              index: "workOrders",
-            },
-          ],
+            { title: "订单管理", index: "orderManagement" },
+            { title: "工单管理", index: "workOrders" }
+          ]
         },
         {
           title: "老人管理",
+          index: "elderManagement",
           subs: [
-            {
-              title: "老人列表",
-              index: "elderList",
-            },
-            {
-              title: "老人基本信息",
-              index: "elderInfo",
-            },
-          ],
+            { title: "老人列表", index: "elderList" },
+            { title: "老人基本信息", index: "elderInfo" }
+          ]
         },
         {
           title: "实时监测",
+          index: "liveMonitoring",
           subs: [
-            {
-              title: "实时监控",
-              index: "liveMonitoring",
-            },
-            {
-              title: "健康数据",
-              index: "healthData",
-            },
-          ],
+            { title: "实时监控", index: "liveMonitoring" },
+            { title: "健康数据", index: "healthData" }
+          ]
         },
         {
           title: "警报管理",
+          index: "alertManagement",
           subs: [
-            {
-              title: "警报列表",
-              index: "alertList",
-            },
-            {
-              title: "警报设置",
-              index: "alertSettings",
-            },
-          ],
-        },
+            { title: "警报列表", index: "alertList" },
+            { title: "警报设置", index: "alertSettings" }
+          ]
+        }
       ],
     };
   },
   watch: {
-    activeTabName: function () {
-      console.log("高亮的index值", this.activeTabName);
-    },
-  },
-  mounted() {
-    // 确保页面加载时根据当前路由设置活动标签
-    const currentRouteName = this.$route.name;
-    if (currentRouteName && !this.editableTabs.some(tab => tab.index === currentRouteName)) {
-      this.editableTabs.push({ title: currentRouteName, index: currentRouteName, closable: true });
+    '$route': {
+      handler(newRoute) {
+        if (!this.editableTabs.some(tab => tab.index === newRoute.name)) {
+          this.editableTabs.push({
+            title: newRoute.meta.title || newRoute.name,
+            index: newRoute.name,
+            closable: true,
+          });
+        }
+        this.activeTabName = newRoute.name || 'home';
+      },
+      immediate: true
     }
-    this.activeTabName = currentRouteName || 'home';
   },
   methods: {
-    handleMenuItem(obj) {
-      // 设置高亮
-      this.activeTabName = obj.index;
-      let result = this.editableTabs.findIndex((tab) => tab.index === obj.index);
-      if (result === -1) {
-        this.editableTabs.push({ ...obj, closable: true });
+    addTab(tabInfo) {
+      if (!this.editableTabs.some(tab => tab.index === tabInfo.index)) {
+        this.editableTabs.push(tabInfo);
       }
-      this.$router.push({ name: obj.index });
+      this.activeTabName = tabInfo.index;
+      this.$router.push({ name: tabInfo.index, params: tabInfo.params });
+    },
+    handleMenuItem(obj) {
+      this.addTab({ ...obj, closable: obj.closable !== false });
     },
     handleSwitchRoute(tabsPaneContext) {
       this.$router.push({ name: tabsPaneContext.paneName });
     },
     handleRemove(targetName) {
-      if (targetName === 'home') {
-        return; // 如果是首页，则不执行任何操作
-      }
+      if (targetName === 'home') return;
+
       let tabs = this.editableTabs;
       let activeName = this.activeTabName;
       if (activeName === targetName) {
-        tabs.forEach((tab, index) => {
-          if (tab.index === targetName) {
-            const nextTab = tabs[index + 1] || tabs[index - 1];
-            if (nextTab) {
-              activeName = nextTab.index;
-            }
-          }
-        });
+        const nextTab = tabs.find(tab => tab.index !== targetName);
+        if (nextTab) {
+          activeName = nextTab.index;
+        }
       }
+
       this.activeTabName = activeName;
       this.editableTabs = tabs.filter(tab => tab.index !== targetName);
       this.$router.push({ name: activeName });
@@ -206,10 +185,16 @@ export default {
             localStorage.removeItem("isLogin");
             this.$router.push("/login");
           })
-          .catch(() => {
-            // 取消：不做任何提示
-          });
+          .catch(() => {});
     },
+  },
+  mounted() {
+    // 确保页面加载时根据当前路由设置活动标签
+    const currentRouteName = this.$route.name;
+    if (currentRouteName && !this.editableTabs.some(tab => tab.index === currentRouteName)) {
+      this.editableTabs.push({ title: currentRouteName, index: currentRouteName, closable: true });
+    }
+    this.activeTabName = currentRouteName || 'home';
   },
 };
 </script>
