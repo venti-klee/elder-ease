@@ -63,7 +63,7 @@
                   :name="item.index"
                   :closable="item.closable"
               >
-                <router-view @addTab="addTab" />
+                <router-view @addTab="addTab" @addTabAlert="addTabAlert"/>
               </el-tab-pane>
             </el-tabs>
           </el-main>
@@ -116,7 +116,7 @@ export default {
           index: "liveMonitoring",
           subs: [
             { title: "实时监控", index: "liveMonitoring" },
-            { title: "健康数据", index: "healthData" }
+            // { title: "健康数据", index: "healthData" }
           ]
         },
         {
@@ -124,7 +124,7 @@ export default {
           index: "alertManagement",
           subs: [
             { title: "警报列表", index: "alertList" },
-            { title: "警报设置", index: "alertSettings" }
+            // { title: "警报设置", index: "alertSettings" }
           ]
         }
       ],
@@ -158,6 +158,27 @@ export default {
     },
     handleSwitchRoute(tabsPaneContext) {
       this.$router.push({ name: tabsPaneContext.paneName });
+    },
+    addTabAlert(tabInfo) {
+      const { name, params } = tabInfo;
+      if (!params || !params.id) {
+        console.error('Missing required param "id":', tabInfo);
+        return;
+      }
+
+      // 检查是否已经存在相同的标签页
+      const isExist = this.editableTabs.some(tab => tab.index === name);
+      if (!isExist) {
+        this.editableTabs.push({
+          title: `警报详情 - ${params.id}`, // 动态设置标题，包含警报ID
+          index: name,
+          closable: true,
+        });
+        // 设置活动标签为新增加的标签
+        this.activeTabName = name;
+        // 导航到新标签对应的路由
+        this.$router.push({ name, params });
+      }
     },
     handleRemove(targetName) {
       if (targetName === 'home') return;
