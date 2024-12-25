@@ -109,7 +109,7 @@ export default {
           index: "elderManagement",
           subs: [
             { title: "老人列表", index: "elderList" },
-            { title: "老人基本信息", index: "elderInfo" }
+            //{ title: "老人基本信息", index: "elderInfo" }
           ]
         },
         {
