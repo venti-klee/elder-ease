@@ -63,7 +63,8 @@
                   :name="item.index"
                   :closable="item.closable"
               >
-                <router-view @addTab="addTab" @addTabAlert="addTabAlert"/>
+                <!-- 监听来自子组件的事件 -->
+                <router-view @addTab="addTab" @addTabAlert="addTabAlert " @addTabElder="addTabElder" @openElderDetail="addTabElder"/>
               </el-tab-pane>
             </el-tabs>
           </el-main>
@@ -166,19 +167,35 @@ export default {
         return;
       }
 
-      // 检查是否已经存在相同的标签页
-      const isExist = this.editableTabs.some(tab => tab.index === name);
-      if (!isExist) {
-        this.editableTabs.push({
-          title: `警报详情 - ${params.id}`, // 动态设置标题，包含警报ID
-          index: name,
-          closable: true,
-        });
-        // 设置活动标签为新增加的标签
-        this.activeTabName = name;
-        // 导航到新标签对应的路由
-        this.$router.push({ name, params });
+      // 直接添加新标签页，不再检查是否存在
+      this.editableTabs.push({
+        title: `警报详情 - ${params.id}`, // 动态设置标题，包含警报ID
+        index: `${name}-${params.id}`, // 确保每个警报详情标签页都有唯一的index
+        closable: true,
+      });
+      // 设置活动标签为新增加的标签
+      this.activeTabName = `${name}-${params.id}`;
+      // 导航到新标签对应的路由
+      this.$router.push({ name, params });
+    },
+
+    addTabElder(tabInfo) {
+      const { name, params } = tabInfo;
+      if (!params || !params.elderid) {
+        console.error('Missing required param "elderid":', tabInfo);
+        return;
       }
+
+      // 直接添加新标签页，不再检查是否存在
+      this.editableTabs.push({
+        title: `老人详情 - ${params.elderid}`, // 动态设置标题，包含老人ID
+        index: `${name}-${params.elderid}`, // 确保每个老人详情标签页都有唯一的index
+        closable: true,
+      });
+      // 设置活动标签为新增加的标签
+      this.activeTabName = `${name}-${params.elderid}`;
+      // 导航到新标签对应的路由
+      this.$router.push({ name, params });
     },
     handleRemove(targetName) {
       if (targetName === 'home') return;

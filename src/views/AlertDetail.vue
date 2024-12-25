@@ -1,15 +1,12 @@
 <template>
   <div class="container">
-
-    <el-row  type="flex" justify="space-between" style="display: flex;">
-      <!-- 在 <el-row> 的结束标签之前添加以下代码 -->
+    <!-- 第一行：编辑警报状态 -->
+    <el-row type="flex" justify="center" style="margin-bottom: 20px;">
       <el-col :span="12">
-        <el-row>
+        <el-row type="flex" justify="space-between" align="middle">
+          <el-col :span="8">警报状态修改:</el-col>
           <el-col :span="8">
-            警报状态修改:
-          </el-col>
-          <el-col :span="8">
-            <el-select v-model="editStatus" placeholder="请选择状态" >
+            <el-select v-model="editStatus" placeholder="请选择状态">
               <el-option label="未解决" value="未解决"></el-option>
               <el-option label="已解决" value="已解决"></el-option>
               <el-option label="错误警报" value="错误警报"></el-option>
@@ -17,41 +14,17 @@
           </el-col>
           <el-col :span="8">
             <el-button type="primary" @click="updateAlertStatus">保存状态</el-button>
-
           </el-col>
         </el-row>
-        <!-- 编辑警报状态 -->
-
-
-         </el-col>
-<!--      <el-col :span="16">-->
-<!--        &lt;!&ndash; 修改警报描述 &ndash;&gt;-->
-<!--        <el-row>-->
-<!--          <el-col :span="6">-->
-<!--            详细描述:-->
-<!--          </el-col>-->
-<!--          <el-col :span="12">-->
-<!--            <el-input-->
-<!--                type="textarea"-->
-<!--                :rows="4"-->
-<!--                placeholder="请输入内容"-->
-<!--                v-model="editDescription"-->
-<!--                style="width: 100%;"-->
-<!--            >-->
-<!--            </el-input>-->
-<!--          </el-col>-->
-<!--          <el-col :span="6">-->
-<!--            <el-button type="primary" @click="updateAlertDescription">保存描述</el-button>-->
-
-<!--          </el-col>-->
-<!--        </el-row>-->
-<!--         </el-col>-->
-
+      </el-col>
     </el-row>
-    <el-row :gutter="20" type="flex" justify="space-between" style="display: flex;">
-      <!-- 左侧卡片区域 -->
-      <el-col :span="12" style="display: flex; flex-direction: column; justify-content: space-between;">
-        <el-card class="alert-detail">
+
+    <!-- 第二行：四张卡片 -->
+    <el-row :gutter="20" type="flex" justify="space-between" style="display: flex; flex-grow: 1;">
+      <!-- 左侧两个卡片 -->
+      <el-col :span="12" style="display: flex; flex-direction: column; flex-grow: 1;">
+        <!-- 警报详情 -->
+        <el-card class="alert-detail" style="flex-grow: 1;">
           <template #header>
             <span>警报详情: {{ alert ? alert.alertID : '' }}</span>
           </template>
@@ -64,7 +37,6 @@
                 <p>警报对象位置:</p>
                 <p>{{ displayLocation(alert.location) }}</p>
                 <p>警报状态: {{ alert.status }}</p>
-<!--                <p>详细描述: {{ alert.description || '无详细描述' }}</p>-->
               </el-col>
               <el-col span="4" style="text-align: left">
                 <p>手环数据</p>
@@ -78,12 +50,26 @@
             <p>加载中...</p>
           </div>
         </el-card>
+        <!-- 老人详情 -->
         <ElderInfoCard :elderID="alert ? alert.elderID : ''" class="elder-info-card" />
       </el-col>
 
-      <!-- 右侧视频区域 -->
-      <el-col :span="12">
-        <el-card class="alert-detail">
+      <!-- 右侧两个卡片 -->
+      <el-col :span="12" style="display: flex; flex-direction: column; flex-grow: 1;">
+        <!-- 地图 -->
+        <el-card class="alert-detail" style="flex-grow: 1;">
+          <template #header>
+            <span>位置信息</span>
+          </template>
+          <div id="map-container" v-if="alert" style="width: 100%; height: 100%;">
+            <tencent-map :key="alert.alertID" :location="alert.location"></tencent-map>
+          </div>
+          <div v-else>
+            <p>加载中...</p>
+          </div>
+        </el-card>
+        <!-- 监控 -->
+        <el-card class="alert-detail" style="flex-grow: 1;">
           <template #header>
             <span>警报监控画面详情: {{ alert?.monitorID || '加载中...' }}</span>
           </template>
@@ -92,34 +78,15 @@
               <source src="/static/video1.mp4" type="video/mp4">
               您的浏览器不支持 video 标签。
             </video>
-<!--            <iframe-->
-<!--                src="https://player.bilibili.com/player.html?bvid=BV1Yf4y1v7be&page=1"-->
-<!--                allowfullscreen-->
-<!--                style="width: 100%; height: 100%;"-->
-<!--            ></iframe>-->
-          </div>
-          <div v-else>
-            <p>加载中...</p>
-          </div>
-        </el-card>
-        <el-card>
-          <template #header>
-            <span>位置信息</span>
-          </template>
-          <div id="map-container" v-if="alert" style="width: 100%; height: 100%;">
-            <!-- 使用动态 key 来强制重新渲染 -->
-            <tencent-map :key="alert.alertID" :location="alert.location"></tencent-map>
           </div>
           <div v-else>
             <p>加载中...</p>
           </div>
         </el-card>
       </el-col>
-
     </el-row>
   </div>
 </template>
-
 <style scoped>
 .container {
   display: flex;
@@ -127,36 +94,32 @@
   width: 100%;
 }
 
-.top-buttons {
+.el-row {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
+  flex-wrap: wrap; /* 允许换行 */
+  margin-bottom: 20px;
 }
 
-.button-container {
+.el-col {
   display: flex;
-  align-items: center;
-  margin-bottom: 10px;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
-
-
-.alert-detail{
-  font-size: 14px;
-  margin: 10px;
-}
+.alert-detail,
 .elder-info-card {
   font-size: 14px;
   margin: 10px;
-  height: 100%;
+  height: auto; /* 根据内容自动调整高度 */
+  min-height: 150px; /* 设置一个合理的最小高度 */
+  flex-grow: 1; /* 让卡片根据内容自动扩展 */
+  overflow: hidden; /* 防止内容溢出 */
 }
 
 .video-wrapper {
   position: relative;
   width: 100%;
   padding-top: 56.25%; /* 这个比例对应于 16:9 的宽高比 */
-  //height: 0;
 }
 
 .video-wrapper iframe {

@@ -1,6 +1,7 @@
 // router/router.js
 import { createRouter, createWebHistory } from 'vue-router';
-import AlertDetail from '../views/AlertDetail.vue'; // 确保路径正确
+import AlertDetail from '../views/AlertDetail.vue';
+import ElderInfo from "@/views/ElderInfo.vue"; // 确保路径正确
 const routes = [
     {
         path: '/login',
@@ -25,6 +26,12 @@ const routes = [
                 component: AlertDetail,
                 props: true // 将路由参数作为props传递给组件
 
+            },
+            {
+                path: '/elder/:elderid',
+                name: 'elderDetail',
+                component: ElderInfo,
+                props: true, // 启用props以接收路由参数
             },
             {
                 path: 'order-management',

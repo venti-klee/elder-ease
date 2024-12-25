@@ -1,9 +1,9 @@
 <script setup>
-
+import WorkOrderManagement from "@/components/WorkOrderManagement.vue";
 </script>
 
 <template>
-  WorkOrders.vue
+  <work-order-management></work-order-management>
 </template>
 
 <style scoped>
