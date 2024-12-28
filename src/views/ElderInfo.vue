@@ -56,6 +56,9 @@
         <el-row>
           <!-- 手环信息显示区域 -->
             <el-card v-if="braceletData">
+              <template #header>
+                <span>手环信息</span>
+              </template>
               <p>心率: {{ braceletData.heartRate }}</p>
               <p>血氧: {{ braceletData.bloodOxygen }}</p>
               <p>血压: {{ braceletData.bloodPressure }}</p>

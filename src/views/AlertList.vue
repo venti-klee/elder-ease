@@ -38,7 +38,7 @@
     </el-form>
 
     <!-- 表格 -->
-    <el-table :data="filteredAlerts" style="width: 100%" @row-click="handleAlertClick" :row-class-name="tableRowClassName">
+    <el-table :data="filteredAlerts" style="width: 100%" @row-click="handleAlertClick2" :row-class-name="tableRowClassName">
       <el-table-column prop="alertID" label="警报ID" width="180" sortable></el-table-column>
       <el-table-column prop="datetime" label="事发时间" width="180" sortable></el-table-column>
       <el-table-column prop="alertType" label="警报类型" width="180" sortable></el-table-column>
@@ -55,7 +55,7 @@ import axios from 'axios';
 
 // 定义 emits
 // eslint-disable-next-line no-undef
-const emit = defineEmits(['addTabAlert']);
+const emit = defineEmits(['openAlertDetail2']);
 
 // 表格数据
 const alerts = ref([]);
@@ -111,15 +111,26 @@ const clearFilters = () => {
 
 // 处理警报卡片点击事件
 // eslint-disable-next-line no-unused-vars
-const handleAlertClick = (row, event) => {
+// const handleAlertClick = (row, event) => {
+//   if (!row || !row.alertID) {
+//     console.error('Invalid row or alertID is missing:', row);
+//     return;
+//   }
+//   console.log('Clicked on row with ID:', row.alertID);
+//   emit('openAlertDetail', { name: 'AlertDetail', params: { id: row.alertID } });
+//
+// };
+// eslint-disable-next-line no-unused-vars
+const handleAlertClick2 = (row, event) => {
+  console.log('Row clicked:', row); // 新增的日志输出
   if (!row || !row.alertID) {
     console.error('Invalid row or alertID is missing:', row);
     return;
   }
-  console.log('Clicked on row with ID:', row.alertID);
-  emit('addTabAlert', { name: 'AlertDetail', params: { id: row.alertID } });
+  const tabInfo = { name: 'AlertDetail', params: { id: row.alertID } };
+  console.log('Emitting openAlertDetail2 with:', tabInfo); // 新增的日志输出
+  emit('openAlertDetail2', tabInfo);
 };
-
 // 提交筛选条件
 const applyFilters = (event) => {
   event.preventDefault(); // 手动阻止默认提交行为

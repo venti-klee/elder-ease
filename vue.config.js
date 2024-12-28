@@ -10,7 +10,7 @@ module.exports = defineConfig({
     compress: true,
     port: 9000,
     client: {
-      // overlay: false, // 禁用错误和警告覆盖层
+      overlay: false, // 禁用错误和警告覆盖层
     },
   },
 });

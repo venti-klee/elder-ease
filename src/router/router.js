@@ -4,13 +4,13 @@ import AlertDetail from '../views/AlertDetail.vue';
 import ElderInfo from "@/views/ElderInfo.vue"; // 确保路径正确
 const routes = [
     {
-        path: '/login',
-        name: "login",
+        path: '/',
+        name: "",
         component: () => import("../views/LoginView.vue"),
     },
 
     {
-        path: '/',
+        path: '/index',
         name: 'index', // 定义名为 'index' 的路由
         redirect: '/home', // 默认重定向到首页
         component: () => import("../views/IndexView.vue"), // 使用 IndexView.vue 作为主布局
@@ -67,12 +67,7 @@ const routes = [
                 path: 'alert-list',
                 name: 'alertList',
                 component: () => import("../views/AlertList.vue"),
-            },
-            {
-                path: 'alert-settings',
-                name: 'alertSettings',
-                component: () => import("../views/AlertSettings.vue"),
-            },
+            }
             // 其他子路由...
         ],
     },
