@@ -54,8 +54,9 @@
 
       <el-col :span="12">
         <el-row>
-          <!-- 手环信息显示区域 -->
-            <el-card v-if="braceletData">
+          <el-col :span="12">
+            <!-- 手环信息显示区域 -->
+            <el-card v-if="braceletData" style="width: 100%">
               <template #header>
                 <span>手环信息</span>
               </template>
@@ -67,6 +68,22 @@
             <div v-else>
               <p>加载中...</p>
             </div>
+          </el-col>
+          <el-col :span="12">
+            <el-card v-if="healthData" style="width: 100%">
+              <template #header>
+                <span>最近一次体检信息</span>
+              </template>
+              <p>检查日期: {{ formatDate(healthData.date) }}</p>
+              <p>血糖: {{ healthData.bloodSuger }} mmol/L</p>
+              <p>血脂: {{ healthData.bloodFat }} mmol/L</p>
+              <p>血红蛋白: {{ healthData.hemoglobin }} g/L</p>
+            </el-card>
+            <div v-else>
+              <p>暂无体检数据</p>
+            </div>
+          </el-col>
+
         </el-row>
         <el-card>
           <template #header>
@@ -147,6 +164,7 @@ const braceletLoaded = ref(false);
 const isMapVisible = ref(false); // 控制地图是否可见
 const braceletData=ref(null);//手环数据
 const originalElderData=ref(null);//保存原来的老人数据
+const healthData=ref(null);//体检数据
 const editForm = ref({});
 // 加载老人信息
 const fetchElderInfo = async (elderId) => {
@@ -200,13 +218,38 @@ const fetchBraceletData = async (elderId) => {
     braceletLoaded.value = true; // 即使出错也要结束加载状态
   }
 };
+const fetchHealthConditionData = async (elderId) => {
+  try {
+    if (!elderId) {
+      console.error('Missing or invalid elderid in route parameters');
+      return;
+    }
 
+    console.log("Fetching health condition data with ID:", elderId);
+
+    const response = await axios.post('http://122.51.230.168:3000/api/execute-soft', {
+      sql: `
+            SELECT * FROM healthcondition
+            WHERE elderID = '${elderId}'
+            ORDER BY date DESC
+            LIMIT 1`
+    });
+
+    if (response.data.length > 0) {
+      healthData.value = response.data[0];
+    }
+  } catch (error) {
+    console.error('There was an error fetching the health condition data!', error);
+  }
+};
 // 组合两个函数以确保顺序执行
 const fetchData = async (elderId) => {
   await fetchElderInfo(elderId);
   await fetchBraceletData(elderId);
+  await fetchHealthConditionData(elderId);
   dataLoaded.value = elderLoaded.value && braceletLoaded.value;
 };
+
 // Fetch the specific alert based on the ID in the route parameters
 // onMounted(async () => {
 //   await fetchData(route.params.elderid);

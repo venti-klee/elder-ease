@@ -531,7 +531,6 @@ const applyFilters = () => {
 const showAddOrderDialog = ref(false);
 // 增加订单表单数据
 const addOrderForm = ref({
-  orderID: '',
   elderID: '',
   type: '',
   remarks: '',
@@ -542,19 +541,12 @@ const addOrderForm = ref({
   endTime: '',
   status: '未完成',
 });
-// 订单编号自动生成
-const generateOrderID = async () => {
-  try {
-    const response = await axios.post('http://122.51.230.168:3000/api/execute-soft', {
-      sql: 'SELECT MAX(orderID) AS maxID FROM `order`',
-    });
-    const maxID = response.data[0]?.maxID || 'order000';
-    const numericPart = maxID.slice(5); // 提取数字部分
-    const newID = `order${String(parseInt(numericPart, 10) + 1).padStart(3, '0')}`;
-    addOrderForm.value.orderID = newID;
-  } catch (error) {
-    console.error('订单编号生成失败', error);
-  }
+// 添加一天到日期的方法
+const addOneDay = (date) => {
+  if (!date) return null;
+  const newDate = new Date(date);
+  newDate.setDate(newDate.getDate() + 1);
+  return newDate.toISOString().split('T')[0];
 };
 // 增加订单方法
 const addOrder = async () => {
@@ -564,18 +556,16 @@ const addOrder = async () => {
   }
 
   try {
-    // 在添加订单之前生成新的订单编号
-    await generateOrderID();
-
     const newOrder = {
       ...addOrderForm.value,
       startDate: addOrderForm.value.startDate
-          ? addOrderForm.value.startDate.toISOString().split('T')[0]
+          ? addOneDay(addOrderForm.value.startDate)
           : null,
       endDate: addOrderForm.value.endDate
-          ? addOrderForm.value.endDate.toISOString().split('T')[0]
+          ? addOneDay(addOrderForm.value.endDate)
           : null,
     };
+    console.log(newOrder);
 
     const response = await axios.post('http://122.51.230.168:3000/api/execute-soft', {
       sql: `INSERT INTO \`order\` (orderID, elderID, type, remarks, frequency, startDate, endDate, startTime, endTime, status)
@@ -592,6 +582,7 @@ const addOrder = async () => {
   } catch (error) {
     console.error('添加订单失败', error);
   }
+  fetchOrders();
 };
 
 onMounted(() => fetchOrders());

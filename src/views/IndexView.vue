@@ -178,7 +178,7 @@ export default {
           // 如果不存在，则添加新标签页
           console.log('Adding new tab for:', tabInfo); // 新增的日志输出
           this.editableTabs.push({
-            title: `警报详情 - ${params.id}`, // 动态设置标题，包含警报ID
+            title: `警报详情 `, // 动态设置标题，包含警报ID
             index: name, // 使用组合的 routeName 和 id 确保唯一性
             closable: true,
           });

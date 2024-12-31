@@ -33,10 +33,10 @@
         </div>
         <div v-else-if="selectedMonitor">
 <!--          <h2>{{ selectedMonitor.formattedAddress }}</h2>-->
-          <p>监控 ID: {{ selectedMonitor.monitorID }}</p>
-          <p v-if="selectedMonitor.location">
+          <text>监控 ID: {{ selectedMonitor.monitorID }}</text>
+          <text v-if="selectedMonitor.location">
            监控地址: {{ selectedMonitor.location }}
-          </p>
+          </text>
           <div>
             监控画面：
             <video src="/static/video1.mp4" autoplay loop></video>

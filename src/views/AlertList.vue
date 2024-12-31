@@ -40,7 +40,11 @@
     <!-- 表格 -->
     <el-table :data="filteredAlerts" style="width: 100%" @row-click="handleAlertClick2" :row-class-name="tableRowClassName">
       <el-table-column prop="alertID" label="警报ID" width="180" sortable></el-table-column>
-      <el-table-column prop="datetime" label="事发时间" width="180" sortable></el-table-column>
+      <el-table-column label="事发时间" width="220" sortable>
+        <template #default="scope">
+          {{ formatDateTime(scope.row.datetime) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="alertType" label="警报类型" width="180" sortable></el-table-column>
       <el-table-column prop="monitorID" label="监控设备ID" width="180" sortable></el-table-column>
       <el-table-column prop="elderID" label="老人ID" width="180" sortable></el-table-column>
@@ -146,6 +150,20 @@ const tableRowClassName = ({ row }) => {
     return 'danger-row';
   }
   return '';
+};
+// 定义一个函数来格式化日期
+const formatDateTime = (datetime) => {
+  if (!datetime) return '';
+  const date = new Date(datetime);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  let hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? '下午' : '上午';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // 如果是0小时则显示为12
+  return `${year}年${month}月${day}日 ${ampm}${hours}:${minutes}`;
 };
 </script>
 <style >
