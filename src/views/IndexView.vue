@@ -64,7 +64,7 @@
                   :closable="item.closable"
               >
                 <!-- 监听来自子组件的事件 -->
-                <router-view @addTab="addTab" @openAlertDetail2="handleOpenAlertDetail2"  @openElderDetail="addTabElder"/>
+                <router-view @addTab="addTab" @openAlertDetail2="handleOpenAlertDetail2"  @openElderDetail="addTabElder" @addTabOrder="addTabOrder" @addTabWorkOrder="addTabWorkOrder"/>
               </el-tab-pane>
             </el-tabs>
           </el-main>
@@ -161,35 +161,35 @@ export default {
       this.$router.push({ name: tabsPaneContext.paneName });
     },
     handleOpenAlertDetail2(tabInfo) {
-        console.log('Received openAlertDetail2 event with:', tabInfo); // 新增的日志输出
-        if (!tabInfo || !tabInfo.params || !tabInfo.params.id) {
-          console.error('Invalid or missing tabInfo:', tabInfo);
-          return;
-        }
-        const { name,params } = tabInfo;
-        const routeName = 'AlertDetail'; // 使用预定义的路由名称
-        const tabIndex = this.editableTabs.findIndex(tab => tab.index === name);
+      console.log('Received openAlertDetail2 event with:', tabInfo); // 新增的日志输出
+      if (!tabInfo || !tabInfo.params || !tabInfo.params.id) {
+        console.error('Invalid or missing tabInfo:', tabInfo);
+        return;
+      }
+      const { name,params } = tabInfo;
+      const routeName = 'AlertDetail'; // 使用预定义的路由名称
+      const tabIndex = this.editableTabs.findIndex(tab => tab.index === name);
 
-        if (tabIndex !== -1) {
-          // 如果标签页已存在，激活它而不是创建新的
-          console.log('Tab already exists:', this.editableTabs[tabIndex]); // 新增的日志输出
-          this.activeTabName = this.editableTabs[tabIndex].index;
-        } else {
-          // 如果不存在，则添加新标签页
-          console.log('Adding new tab for:', tabInfo); // 新增的日志输出
-          this.editableTabs.push({
-            title: `警报详情 `, // 动态设置标题，包含警报ID
-            index: name, // 使用组合的 routeName 和 id 确保唯一性
-            closable: true,
-          });
-          // 设置活动标签为新增加的标签
-          this.activeTabName = name;
-        }
+      if (tabIndex !== -1) {
+        // 如果标签页已存在，激活它而不是创建新的
+        console.log('Tab already exists:', this.editableTabs[tabIndex]); // 新增的日志输出
+        this.activeTabName = this.editableTabs[tabIndex].index;
+      } else {
+        // 如果不存在，则添加新标签页
+        console.log('Adding new tab for:', tabInfo); // 新增的日志输出
+        this.editableTabs.push({
+          title: `警报详情 `, // 动态设置标题，包含警报ID
+          index: name, // 使用组合的 routeName 和 id 确保唯一性
+          closable: true,
+        });
+        // 设置活动标签为新增加的标签
+        this.activeTabName = name;
+      }
 
-        // 导航到新标签对应的路由
-        this.$router.push({ name: routeName, params });
-        console.log('Opened alert detail:', tabInfo);
-      },
+      // 导航到新标签对应的路由
+      this.$router.push({ name: routeName, params });
+      console.log('Opened alert detail:', tabInfo);
+    },
     // handleOpenAlertDetail(tabInfo) {
     //   console.log("!1111handleOpenAlertDetail")
     //   const { name, params } = tabInfo;
@@ -235,6 +235,64 @@ export default {
         });
         // 设置活动标签为新增加的标签
         this.activeTabName = `${name}-${params.elderid}`;
+      }
+
+      // 导航到对应标签页的路由
+      this.$router.push({ name, params });
+    },
+    addTabOrder(tabInfo) {
+      const { name, params } = tabInfo;
+      if (!params || !params.orderID) {
+        console.error('Missing required param "orderID":', tabInfo);
+        return;
+      }
+
+      // 检查是否已经有对应的标签页存在
+      const existingTab = this.editableTabs.find(tab =>
+          tab.index === `${name}-${params.orderID}`
+      );
+
+      if (existingTab) {
+        // 如果存在，设置活动标签为已存在的标签
+        this.activeTabName = existingTab.index;
+      } else {
+        // 如果不存在，添加新标签页
+        this.editableTabs.push({
+          title: `订单详情 `, // 动态设置标题，包含订单ID
+          index: name, // 确保每个订单详情标签页都有唯一的index
+          closable: true,
+        });
+        // 设置活动标签为新增加的标签
+        this.activeTabName = name;
+      }
+
+      // 导航到对应标签页的路由
+      this.$router.push({ name, params });
+    },
+    addTabWorkOrder(tabInfo) {
+      const { name, params } = tabInfo;
+      if (!params || !params.workOrderID) {
+        console.error('Missing required param "workOrderID":', tabInfo);
+        return;
+      }
+
+      // 检查是否已经有对应的标签页存在
+      const existingTab = this.editableTabs.find(tab =>
+          tab.index === `${name}-${params.workOrderID}`
+      );
+
+      if (existingTab) {
+        // 如果存在，设置活动标签为已存在的标签
+        this.activeTabName = existingTab.index;
+      } else {
+        // 如果不存在，添加新标签页
+        this.editableTabs.push({
+          title: `工单详情 `, // 动态设置标题，包含订单ID
+          index: name, // 确保每个订单详情标签页都有唯一的index
+          closable: true,
+        });
+        // 设置活动标签为新增加的标签
+        this.activeTabName = name;
       }
 
       // 导航到对应标签页的路由

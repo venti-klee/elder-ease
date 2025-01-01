@@ -2,6 +2,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import AlertDetail from '../views/AlertDetail.vue';
 import ElderInfo from "@/views/ElderInfo.vue"; // 确保路径正确
+import OrderInfo from '../views/OrderInfo.vue';
+import WorkOrderInfo from "@/views/WorkOrderInfo.vue";
+
 const routes = [
     {
         path: '/',
@@ -67,7 +70,19 @@ const routes = [
                 path: 'alert-list',
                 name: 'alertList',
                 component: () => import("../views/AlertList.vue"),
-            }
+            },
+            {
+                path: '/order/:orderID',
+                name: 'order-detail',
+                component: OrderInfo,
+                props: true // 将路由参数作为props传递给组件
+            },
+            {
+                path: '/workOrder/:workOrderID',
+                name: 'workorder-detail',
+                component: WorkOrderInfo,
+                props: true // 将路由参数作为props传递给组件
+            },
             // 其他子路由...
         ],
     },

@@ -163,7 +163,7 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="160">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="showDetails(row)">查看详情</el-button>
+            <el-button link type="primary" size="small" @click="showOrderDetails(row)">查看详情</el-button>
             <el-button link type="primary" size="small" @click="showEdit(row)">编辑</el-button>
             <el-button link type="danger" size="small" @click="deleteRow(row)">删除</el-button>
           </template>
@@ -280,10 +280,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import {ref, computed, onMounted, defineEmits} from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 
+const emit = defineEmits(['addTabOrder']);
 // 表格数据
 const tableData = ref([]);
 
@@ -426,9 +427,15 @@ const handleSortChange = ({prop, order}) => {
 };
 
 // 展示详情
-const showDetails = (row) => {
-  currentRow.value = {...row};
-  dialogVisibleDetail.value = true;
+// const showDetails = (row) => {
+//   currentRow.value = {...row};
+//   dialogVisibleDetail.value = true;
+// };
+// 展示订单详情
+const showOrderDetails = (row) => {
+  // OrderManagement.vue 或其他相关组件
+  console.log('Emitting addTabOrder event with:', { name: 'order-detail', params: { orderID: row.orderID } });
+  emit('addTabOrder', { name: 'order-detail', params: { orderID: row.orderID } });
 };
 
 // 编辑功能
@@ -570,7 +577,7 @@ const addOrder = async () => {
     const response = await axios.post('http://122.51.230.168:3000/api/execute-soft', {
       sql: `INSERT INTO \`order\` (orderID, elderID, type, remarks, frequency, startDate, endDate, startTime, endTime, status)
             VALUES ('${newOrder.orderID}', '${newOrder.elderID}', '${newOrder.type}', '${newOrder.remarks}', '${newOrder.frequency}',
-            '${newOrder.startDate}', '${newOrder.endDate}', '${newOrder.startTime}', '${newOrder.endTime}', '${newOrder.status}')`,
+                    '${newOrder.startDate}', '${newOrder.endDate}', '${newOrder.startTime}', '${newOrder.endTime}', '${newOrder.status}')`,
     });
 
     if (response.data.affectedRows > 0) {

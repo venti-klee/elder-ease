@@ -66,7 +66,7 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="160">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="showDetails(row)">查看详情</el-button>
+            <el-button link type="primary" size="small" @click="showWorkOrderDetails(row)">查看详情</el-button>
             <el-button link type="primary" size="small" @click="showEdit(row)">编辑</el-button>
             <el-button link type="danger" size="small" @click="deleteRow(row)">删除</el-button>
           </template>
@@ -153,9 +153,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import {ref, computed, onMounted, defineEmits} from 'vue';
 import { ElMessage } from 'element-plus';
 import axios from 'axios';
+
+const emit = defineEmits(['addTabWorkOrder']);
+// 展示订单详情
+const showWorkOrderDetails = (row) => {
+  // OrderManagement.vue 或其他相关组件
+  console.log('Emitting addTabWorkOrder event with:', { name: 'workorder-detail', params: { workOrderID: row.workOrderID} });
+  emit('addTabWorkOrder', { name: 'workorder-detail', params: { workOrderID: row.workOrderID } });
+};
 
 // 表格数据
 const tableData = ref([]);
@@ -214,9 +222,9 @@ const fetchWorkOrders = async (filterParams = {}) => {
       SELECT w.workOrderID, w.orderID, w.date, w.status, w.workerID, wi.workerName,
              o.elderID, o.type, o.remarks, o.startTime, o.endTime, ei.elderName
       FROM \`workorder\` w
-      LEFT JOIN \`order\` o ON w.orderID = o.orderID
-      LEFT JOIN \`elderinfo\` ei ON o.elderID = ei.elderID
-      LEFT JOIN \`workerinfo\` wi ON w.workerID = wi.workerID
+             LEFT JOIN \`order\` o ON w.orderID = o.orderID
+             LEFT JOIN \`elderinfo\` ei ON o.elderID = ei.elderID
+             LEFT JOIN \`workerinfo\` wi ON w.workerID = wi.workerID
       WHERE 1=1
     `;
 
@@ -297,10 +305,10 @@ const deleteRow = async (row) => {
 };
 
 // 展示详情
-const showDetails = (row) => {
-  currentRow.value = {...row};
-  dialogVisibleDetail.value = true;
-};
+// const showDetails = (row) => {
+//   currentRow.value = {...row};
+//   dialogVisibleDetail.value = true;
+// };
 
 // 显示编辑对话框
 const showEdit = (row) => {
@@ -317,6 +325,7 @@ const saveEdit = async () => {
           ? editForm.value.date.toISOString().split('T')[0]
           : null,
     };
+
 
     // 发送更新请求，使用参数化查询
     const response = await axios.post('http://122.51.230.168:3000/api/execute-soft', {
